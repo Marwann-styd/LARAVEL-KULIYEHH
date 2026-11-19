@@ -1,0 +1,875 @@
+/* ==========================================================================
+   PT INDOFOOD - WAREHOUSE FINISHED GOODS (WMS) ENTERPRISE THEME
+   Design System: Indofood Modern Command Suite
+   ========================================================================== */
+
+:root {
+    --indo-navy: #0E2340;
+    --indo-navy-deep: #09182D;
+    --indo-navy-soft: #17355E;
+    --indo-blue: #00529B;
+    --indo-blue-hover: #003F78;
+    --indo-blue-tint: #EBF3FA;
+    --indo-red: #D71920;
+    --indo-red-tint: #FDECEC;
+    --indo-gold: #D97706;
+    --indo-gold-tint: #FEF5E7;
+    --indo-green: #0F766E;
+    --indo-green-tint: #E7F6F4;
+
+    --bg-canvas: #F1F5F9;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F8FAFC;
+    --border-crisp: #D8E2EC;
+    --border-light: #E6EDF4;
+
+    --text-primary: #0F233C;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+
+    --sidebar-width: 256px;
+    --topbar-height: 62px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 12px;
+    --shadow-card: 0 1px 3px rgba(14, 35, 64, 0.05), 0 1px 2px rgba(14, 35, 64, 0.03);
+    --shadow-elevated: 0 8px 24px rgba(14, 35, 64, 0.09);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   APPLICATION SHELL (FIXED SIDEBAR + CONTEXT TOPBAR)
+   ========================================================================== */
+
+.wms-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Left Sidebar */
+.wms-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1040;
+    width: var(--sidebar-width);
+    background: var(--indo-navy);
+    color: #E2E8F0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.24s ease;
+}
+
+/* Signature Indofood Red Top Bar */
+.wms-sidebar::before {
+    content: "";
+    display: block;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--indo-red) 0%, var(--indo-red) 34%, var(--indo-blue) 34%, #1A73C8 100%);
+    flex-shrink: 0;
+}
+
+.wms-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 18px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+}
+
+.wms-brand-logo {
+    width: 52px;
+    height: 42px;
+    flex-shrink: 0;
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 5px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+.wms-brand-logo img {
+    width: 100%;
+    max-height: 32px;
+    object-fit: contain;
+}
+
+.wms-brand-text {
+    min-width: 0;
+}
+
+.wms-brand-name {
+    display: block;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.wms-brand-sub {
+    display: block;
+    color: #93B0D1;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.wms-nav-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px 20px;
+}
+
+.wms-nav-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.wms-nav-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+}
+
+.wms-nav-section {
+    padding: 14px 10px 6px;
+    color: #7D9BC0;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.wms-nav-section:first-child {
+    padding-top: 4px;
+}
+
+.wms-nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin-bottom: 2px;
+    border-radius: 8px;
+    color: #CBD8E8;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.wms-nav-link i {
+    width: 18px;
+    text-align: center;
+    font-size: 15px;
+    color: #87A7CC;
+    transition: color 0.15s ease;
+}
+
+.wms-nav-link:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #FFFFFF;
+}
+
+.wms-nav-link:hover i {
+    color: #FFFFFF;
+}
+
+.wms-nav-link.active {
+    background: var(--indo-blue);
+    color: #FFFFFF;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 82, 155, 0.45);
+}
+
+.wms-nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    bottom: 7px;
+    width: 3px;
+    background: var(--indo-red);
+    border-radius: 0 3px 3px 0;
+}
+
+.wms-nav-link.active i {
+    color: #FFFFFF;
+}
+
+/* Sidebar Bottom User Card */
+.wms-sidebar-footer {
+    padding: 12px 14px;
+    background: var(--indo-navy-deep);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wms-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wms-sidebar-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--indo-blue);
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wms-sidebar-user-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.wms-sidebar-user-name {
+    color: #FFFFFF;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wms-sidebar-user-role {
+    color: #8CA9CC;
+    font-size: 10.5px;
+    font-weight: 600;
+}
+
+/* Main Workspace */
+.wms-workspace {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Context Topbar */
+.wms-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    height: var(--topbar-height);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-crisp);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.wms-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.wms-mobile-trigger {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border-crisp);
+    background: var(--bg-surface);
+    color: var(--indo-navy);
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.wms-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wms-breadcrumb-root {
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.wms-breadcrumb-sep {
+    color: #CBD5E1;
+    font-size: 11px;
+}
+
+.wms-breadcrumb-current {
+    font-weight: 700;
+    color: var(--indo-navy);
+}
+
+.wms-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wms-scope-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    background: var(--indo-blue-tint);
+    border: 1px solid #C5DDF3;
+    border-radius: 6px;
+    color: var(--indo-blue);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.wms-scope-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10B981;
+}
+
+.wms-date-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.wms-account-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-crisp);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.wms-account-btn:hover {
+    background: var(--bg-subtle);
+    border-color: #B8C7D8;
+}
+
+/* Main Container */
+.wms-main {
+    flex: 1;
+    padding: 24px 28px 36px;
+    max-width: 1520px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.wms-footer {
+    padding: 14px 28px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    font-size: 11.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.wms-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1035;
+    background: rgba(9, 24, 45, 0.52);
+}
+
+.wms-backdrop.show {
+    display: block;
+}
+
+/* ==========================================================================
+   STANDARDIZED ENTERPRISE COMPONENTS (USED ACROSS ALL 28 VIEWS)
+   ========================================================================== */
+
+/* Page Header */
+.wms-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-crisp);
+}
+
+.wms-page-title {
+    margin: 0;
+    color: var(--indo-navy);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+}
+
+.wms-page-subtitle {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* Crisp KPI Card (No AI radial orbs) */
+.wms-kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-crisp);
+    border-left: 4px solid var(--kpi-accent, var(--indo-blue));
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    box-shadow: var(--shadow-card);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.wms-kpi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.wms-kpi-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.wms-kpi-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--kpi-tint, var(--indo-blue-tint));
+    color: var(--kpi-accent, var(--indo-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.wms-kpi-value {
+    color: var(--indo-navy);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+.wms-kpi-note {
+    color: var(--text-muted);
+    font-size: 11.5px;
+    margin-top: 6px;
+}
+
+/* Surface Panel */
+.wms-panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-crisp);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.wms-panel-header {
+    padding: 14px 20px;
+    background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.wms-panel-title {
+    margin: 0;
+    color: var(--indo-navy);
+    font-size: 14.5px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wms-panel-title i {
+    color: var(--indo-blue);
+    font-size: 16px;
+}
+
+.wms-panel-subtitle {
+    margin: 2px 0 0;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.wms-panel-body {
+    padding: 20px;
+}
+
+/* Buttons */
+.btn-indo-primary {
+    background-color: var(--indo-blue);
+    border-color: var(--indo-blue);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s ease;
+}
+
+.btn-indo-primary:hover,
+.btn-indo-primary:focus {
+    background-color: var(--indo-blue-hover);
+    border-color: var(--indo-blue-hover);
+    color: #FFFFFF;
+}
+
+.btn-indo-red {
+    background-color: var(--indo-red);
+    border-color: var(--indo-red);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.btn-indo-red:hover {
+    background-color: #B8141A;
+    border-color: #B8141A;
+    color: #FFFFFF;
+}
+
+.btn-indo-outline {
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-crisp);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 15px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-indo-outline:hover {
+    background-color: var(--bg-subtle);
+    border-color: #B6C5D6;
+    color: var(--indo-navy);
+}
+
+/* Forms */
+.wms-form-label {
+    display: block;
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.wms-control,
+.wms-panel .form-control,
+.wms-panel .form-select {
+    min-height: 40px;
+    border: 1px solid var(--border-crisp);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    background-color: #FFFFFF;
+    box-shadow: none;
+}
+
+.wms-control:focus,
+.wms-panel .form-control:focus,
+.wms-panel .form-select:focus {
+    border-color: var(--indo-blue);
+    box-shadow: 0 0 0 3px rgba(0, 82, 155, 0.12);
+}
+
+.wms-form-section-title {
+    color: var(--indo-blue);
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.wms-help-text {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    margin-top: 5px;
+}
+
+.wms-info-box {
+    padding: 12px 15px;
+    background: var(--indo-blue-tint);
+    border: 1px solid #C5DDF3;
+    border-left: 3px solid var(--indo-blue);
+    border-radius: 8px;
+    color: #163A63;
+    font-size: 12.5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Data Tables */
+.wms-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.wms-table thead th {
+    background: #F4F7FA;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-crisp);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    white-space: nowrap;
+}
+
+.wms-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.wms-table tbody tr:hover {
+    background-color: #F8FBFE;
+}
+
+.wms-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.wms-code-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--indo-blue-tint);
+    border: 1px solid #C8DFF4;
+    border-radius: 5px;
+    color: var(--indo-blue);
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.wms-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.wms-pill-blue { background: var(--indo-blue-tint); color: var(--indo-blue); border: 1px solid #C8DFF4; }
+.wms-pill-green { background: var(--indo-green-tint); color: var(--indo-green); border: 1px solid #BDE6E1; }
+.wms-pill-red { background: var(--indo-red-tint); color: var(--indo-red); border: 1px solid #F7C6C8; }
+.wms-pill-gold { background: var(--indo-gold-tint); color: #B45309; border: 1px solid #F9DFB5; }
+.wms-pill-slate { background: #F1F5F9; color: #334155; border: 1px solid #DCE4EE; }
+
+.wms-action-btn {
+    width: 31px;
+    height: 31px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13.5px;
+}
+
+/* Progress Bar */
+.wms-progress {
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.wms-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+/* Pagination */
+.wms-pagination-bar {
+    padding: 13px 20px;
+    background: var(--bg-subtle);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.wms-pagination-bar .pagination {
+    margin-bottom: 0;
+}
+
+.wms-pagination-bar .page-link {
+    border-radius: 6px;
+    margin: 0 2px;
+    color: var(--indo-blue);
+    border-color: var(--border-crisp);
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.wms-pagination-bar .page-item.active .page-link {
+    background-color: var(--indo-blue);
+    border-color: var(--indo-blue);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   RESPONSIVE & PRINT RULES
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+    .wms-sidebar {
+        transform: translateX(-100%);
+    }
+    .wms-sidebar.open {
+        transform: translateX(0);
+    }
+    .wms-workspace {
+        margin-left: 0;
+    }
+    .wms-mobile-trigger {
+        display: inline-flex;
+    }
+    .wms-topbar {
+        padding: 0 16px;
+    }
+    .wms-main {
+        padding: 18px 16px 28px;
+    }
+    .wms-date-pill {
+        display: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .wms-scope-pill {
+        display: none;
+    }
+    .wms-page-title {
+        font-size: 19px;
+    }
+}
+
+@media print {
+    .wms-sidebar,
+    .wms-topbar,
+    .wms-footer,
+    .wms-backdrop,
+    .no-print {
+        display: none !important;
+    }
+    .wms-workspace {
+        margin-left: 0 !important;
+    }
+    .wms-main {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+    .wms-panel,
+    .wms-kpi-card {
+        box-shadow: none !important;
+        border: 1px solid #CBD5E1 !important;
+    }
+    body {
+        background: #FFFFFF !important;
+    }
+    @page {
+        size: landscape;
+        margin: 12mm;
+    }
+}
