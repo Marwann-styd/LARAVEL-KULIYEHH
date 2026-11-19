@@ -75,4 +75,4 @@ Sistem ini dirancang khusus untuk mendukung operasional gudang **PT Indofood** d
 1. **Clone repository ini**
    ```bash
    git clone https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git
-   https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git
+ 
