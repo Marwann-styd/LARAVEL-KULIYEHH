@@ -1,58 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# 📦 Warehouse FG — Finished Goods Monitoring System
+### Sistem Manajemen Penyimpanan & Monitoring Kapasitas Gudang PT Indofood
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+*Aplikasi web terintegrasi untuk memantau okupansi rak penyimpanan, melacak distribusi stok SKU Finished Goods, serta mencatat transaksi mutasi pallet secara real-time.*
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+</div>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🎯 Latar Belakang & Tujuan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Pengelolaan gudang barang jadi (*Finished Goods*) membutuhkan visibilitas yang akurat terhadap sisa kapasitas rak, posisi setiap varian produk (SKU), serta riwayat pergerakan barang agar proses distribusi berjalan optimal tanpa *over-capacity* maupun salah penempatan lokasi.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Sistem ini dirancang khusus untuk mendukung operasional gudang **PT Indofood** dengan fitur pelacakan berbasis **Gudang $\rightarrow$ Area $\rightarrow$ Rak $\rightarrow$ Level Rak**, konversi otomatis **Pallet ke Karton**, serta kontrol akses berbasis peran (*Role-Based Access Control*).
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## ✨ Fitur Utama Sistem
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. 📊 Dashboard & Warehouse Command Center
+* Ringkasan KPI infrastruktur gudang (Total Gudang, Area, Rak, dan SKU Aktif).
+* Indikator visual tingkat okupansi penyimpanan dalam satuan **Pallet** dan estimasi **Karton**.
+* **Warehouse Command Center** per unit gudang dengan akses cepat yang menyesuaikan *role* pengguna.
 
-```bash
-composer require laravel/boost --dev
+### 2. 🗂️ Pengelolaan Master Data (Super Admin)
+* **Data Gudang:** Manajemen unit gudang aktif beserta status operasionalnya.
+* **Data Area:** Pembagian zona penyimpanan pada masing-masing unit gudang.
+* **Data Rak & Level:** Konfigurasi unit rak (3 atau 4 tingkat level) dengan kapasitas standar **3 pallet per level** serta tampilan matriks slot rak.
+* **Kategori & Master Produk (SKU):** Pengelolaan katalog produk jadi lengkap dengan rasio **Standar Isi Karton per Pallet** untuk konversi stok otomatis.
+* **Manajemen Pengguna:** Pengaturan akun personel, aktivasi/nonaktivasi akun, dan penetapan unit gudang tugas.
 
-php artisan boost:install
-```
+### 3. 🔄 Operasional & Transaksi Penyimpanan
+* **Monitoring Kapasitas:** Pemantauan sisa slot pallet secara hierarkis dari level gudang hingga detail tingkatan rak.
+* **Lokasi Produk:** Pelacakan posisi penyimpanan setiap SKU lengkap dengan informasi jumlah pallet dan total karton.
+* **Transaksi Penyimpanan (`IN`, `OUT`, `MOVE`):**
+  * `IN` (Barang Masuk): Penempatan pallet baru ke level rak kosong atau level dengan SKU yang sama.
+  * `OUT` (Barang Keluar): Pengurangan stok pallet dari level rak asal untuk kebutuhan distribusi.
+  * `MOVE` (Pindah Lokasi): Relokasi stok antar level rak dengan penguncian transaksi (*pessimistic locking*) untuk menjaga integritas stok.
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 4. 📑 Pusat Laporan & Audit
+* **Laporan Stok Produk per Lokasi:** Rekapitulasi posisi stok aktif yang dapat difilter berdasarkan gudang, kategori, maupun kode SKU/rak.
+* **Laporan Riwayat Transaksi:** Log audit keluar-masuk dan perpindahan barang berdasarkan rentang tanggal, jenis transaksi, dan unit gudang.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🔐 Matriks Hak Akses Pengguna (RBAC)
 
-## Code of Conduct
+| Role | Cakupan Gudang | Master Data & User | Monitoring & Lokasi | Input Transaksi (`IN/OUT/MOVE`) | Laporan & Riwayat |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Super Admin** | Semua Gudang Aktif | ✅ Penuh | ✅ Lihat | ✅ Penuh | ✅ Semua Gudang |
+| **Admin Gudang** | Gudang Penugasan | ❌ | ✅ Lihat | ✅ Penuh | ✅ Gudang Tugas |
+| **Supervisor** | Gudang Penugasan | ❌ | ✅ Lihat (*Read-Only*) | ❌ (*Read-Only*) | ✅ Gudang Tugas |
+| **Petugas FG** | Gudang Penugasan | ❌ | ✅ Lihat | ✅ Penuh | ✅ Gudang Tugas |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🛠️ Teknologi yang Digunakan
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* **Backend Framework:** Laravel 13 (PHP 8.5)
+* **Database:** PostgreSQL
+* **Frontend & UI:** Blade Templating Engine, Bootstrap 5.3, Bootstrap Icons, Custom Enterprise CSS (`indofood-wms.css`)
+* **Keamanan & Concurrency:** Laravel Auth Middleware, Role-Based Access Control (RBAC), Database Transaction & Row-Level Locking (`lockForUpdate`)
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🚀 Panduan Instalasi Lokal
+
+1. **Clone repository ini**
+   ```bash
+   git clone [https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git](https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git)
+   cd LARAVEL-KULIYEHH
