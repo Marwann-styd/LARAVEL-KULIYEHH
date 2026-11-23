@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
+use Illuminate\Support\Facades\Auth;
 
 class MonitoringCapacityController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $warehouseQuery = Warehouse::with([
             'areas' => function ($query) {

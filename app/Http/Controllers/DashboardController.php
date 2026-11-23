@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Area;
 use App\Models\Rack;
 use App\Models\Product;
@@ -13,7 +14,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = auth::user();
 
         // Pengamanan akun non-Super Admin.
         // Pengguna wajib memiliki penugasan gudang.
