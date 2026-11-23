@@ -95,7 +95,20 @@ Sistem Informasi Pemantauan Penyimpanan & Mutasi Barang Jadi (*Finished Goods*) 
 
 ---
 
+## Cuplikan Antarmuka Sistem
+
+| Halaman Login Sistem | Dashboard & Monitoring Kapasitas |
+| :---: | :---: |
+| ![Halaman Login](docs/screenshots/login.png) | ![Dashboard WMS](docs/screenshots/dashboard.png) |
+
+| Transaksi Mutasi Pallet (`IN / OUT / MOVE`) | Manajemen Akun & Hak Akses (RBAC) |
+| :---: | :---: |
+| ![Transaksi Penyimpanan](docs/screenshots/transaksi.png) | ![Manajemen Akun](docs/screenshots/manajemen-akun.png) |
+
+---
+
 ## Pengembang
+
 
 - **Marwan Setyadi** — Mahasiswa Teknik Informatika (Proyek Kerja Praktik)
 - **Repositori:** [github.com/Marwann-styd/LARAVEL-KULIYEHH](https://github.com/Marwann-styd/LARAVEL-KULIYEHH)
