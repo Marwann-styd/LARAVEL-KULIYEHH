@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk Sistem â€” Warehouse FG PT Indofood</title>
+    <title>Masuk Sistem Warehouse FG PT Indofood</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
@@ -19,7 +21,9 @@
             --border-crisp: #D8E2EC;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -268,16 +272,24 @@
                 max-width: 460px;
                 grid-template-columns: 1fr;
             }
+
             .brand-side {
                 padding: 30px 26px;
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             }
-            .system-tag { margin-top: 22px; }
-            .form-side { padding: 32px 26px; }
+
+            .system-tag {
+                margin-top: 22px;
+            }
+
+            .form-side {
+                padding: 32px 26px;
+            }
         }
     </style>
 </head>
+
 <body>
     <main class="login-shell">
         {{-- PANEL IDENTITAS PT INDOFOOD --}}
@@ -296,7 +308,8 @@
 
                 <h1 class="brand-heading">Warehouse Finished Goods</h1>
                 <p class="brand-desc">
-                    Sistem operasional terintegrasi untuk pemantauan kapasitas pallet, penempatan rak, serta pencatatan mutasi produk jadi.
+                    Sistem operasional terintegrasi untuk pemantauan kapasitas pallet, penempatan rak, serta pencatatan
+                    mutasi produk jadi.
                 </p>
 
                 <div class="module-list">
@@ -341,17 +354,9 @@
                     <label class="form-label" for="email">Alamat Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            class="form-control"
-                            value="{{ old('email') }}"
-                            placeholder="nama@indofood.co.id"
-                            autocomplete="username"
-                            required
-                            autofocus
-                        >
+                        <input type="email" id="email" name="email" class="form-control"
+                            value="{{ old('email') }}" placeholder="nama@indofood.co.id" autocomplete="username"
+                            required autofocus>
                     </div>
                 </div>
 
@@ -359,16 +364,10 @@
                     <label class="form-label" for="password">Kata Sandi</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control"
-                            placeholder="Masukkan kata sandi"
-                            autocomplete="current-password"
-                            required
-                        >
-                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Tampilkan kata sandi">
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+                        <button type="button" class="password-toggle" id="togglePassword"
+                            aria-label="Tampilkan kata sandi">
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
@@ -386,7 +385,7 @@
 
             <div class="form-footer">
                 Warehouse Finished Goods Monitoring System &copy; {{ date('Y') }}<br>
-                Akses Terbatas â€” PT Indofood
+                Akses Terbatas PT Indofood
             </div>
         </section>
     </main>
@@ -395,7 +394,7 @@
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
-        togglePassword.addEventListener('click', function () {
+        togglePassword.addEventListener('click', function() {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
             this.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
@@ -403,4 +402,5 @@
         });
     </script>
 </body>
+
 </html>
