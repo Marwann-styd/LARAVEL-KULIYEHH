@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StoragePlacement;
-use App\Models\user;
+use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\Category;
 use App\Models\StorageTransaction;
@@ -15,7 +15,7 @@ class ReportController extends Controller
     /**
      * Menentukan gudang yang boleh diakses pengguna.
      */
-    private function getWarehouseQuery($user)
+    private function getWarehouseQuery(User $user)
     {
         $query = Warehouse::where('is_active', true);
 

@@ -1,78 +1,101 @@
-<div align="center">
+# Warehouse Finished Goods Monitoring System (WMS) — PT Indofood
 
-# 📦 Warehouse FG — Finished Goods Monitoring System
-### Sistem Manajemen Penyimpanan & Monitoring Kapasitas Gudang PT Indofood
-
-![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
-
-*Aplikasi web terintegrasi untuk memantau okupansi rak penyimpanan, melacak distribusi stok SKU Finished Goods, serta mencatat transaksi mutasi pallet secara real-time.*
-
-</div>
+Sistem Informasi Pemantauan Penyimpanan & Mutasi Barang Jadi (*Finished Goods*) berbasis web untuk mendukung operasional pergudangan **PT Indofood**. Aplikasi ini dirancang untuk mengontrol kapasitas rak secara *real-time*, menjaga integritas penempatan SKU per level rak, serta menyediakan audit log mutasi dan laporan stok siap cetak.
 
 ---
 
-## 🎯 Latar Belakang & Tujuan
+## Tech Stack
 
-Pengelolaan gudang barang jadi (*Finished Goods*) membutuhkan visibilitas yang akurat terhadap sisa kapasitas rak, posisi setiap varian produk (SKU), serta riwayat pergerakan barang agar proses distribusi berjalan optimal tanpa *over-capacity* maupun salah penempatan lokasi.
-
-Sistem ini dirancang khusus untuk mendukung operasional gudang **PT Indofood** dengan fitur pelacakan berbasis **Gudang $\rightarrow$ Area $\rightarrow$ Rak $\rightarrow$ Level Rak**, konversi otomatis **Pallet ke Karton**, serta kontrol akses berbasis peran (*Role-Based Access Control*).
-
----
-
-## ✨ Fitur Utama Sistem
-
-### 1. 📊 Dashboard & Warehouse Command Center
-* Ringkasan KPI infrastruktur gudang (Total Gudang, Area, Rak, dan SKU Aktif).
-* Indikator visual tingkat okupansi penyimpanan dalam satuan **Pallet** dan estimasi **Karton**.
-* **Warehouse Command Center** per unit gudang dengan akses cepat yang menyesuaikan *role* pengguna.
-
-### 2. 🗂️ Pengelolaan Master Data (Super Admin)
-* **Data Gudang:** Manajemen unit gudang aktif beserta status operasionalnya.
-* **Data Area:** Pembagian zona penyimpanan pada masing-masing unit gudang.
-* **Data Rak & Level:** Konfigurasi unit rak (3 atau 4 tingkat level) dengan kapasitas standar **3 pallet per level** serta tampilan matriks slot rak.
-* **Kategori & Master Produk (SKU):** Pengelolaan katalog produk jadi lengkap dengan rasio **Standar Isi Karton per Pallet** untuk konversi stok otomatis.
-* **Manajemen Pengguna:** Pengaturan akun personel, aktivasi/nonaktivasi akun, dan penetapan unit gudang tugas.
-
-### 3. 🔄 Operasional & Transaksi Penyimpanan
-* **Monitoring Kapasitas:** Pemantauan sisa slot pallet secara hierarkis dari level gudang hingga detail tingkatan rak.
-* **Lokasi Produk:** Pelacakan posisi penyimpanan setiap SKU lengkap dengan informasi jumlah pallet dan total karton.
-* **Transaksi Penyimpanan (`IN`, `OUT`, `MOVE`):**
-  * `IN` (Barang Masuk): Penempatan pallet baru ke level rak kosong atau level dengan SKU yang sama.
-  * `OUT` (Barang Keluar): Pengurangan stok pallet dari level rak asal untuk kebutuhan distribusi.
-  * `MOVE` (Pindah Lokasi): Relokasi stok antar level rak dengan penguncian transaksi (*pessimistic locking*) untuk menjaga integritas stok.
-
-### 4. 📑 Pusat Laporan & Audit
-* **Laporan Stok Produk per Lokasi:** Rekapitulasi posisi stok aktif yang dapat difilter berdasarkan gudang, kategori, maupun kode SKU/rak.
-* **Laporan Riwayat Transaksi:** Log audit keluar-masuk dan perpindahan barang berdasarkan rentang tanggal, jenis transaksi, dan unit gudang.
+- **Backend:** PHP 8.x, Laravel Framework
+- **Database:** PostgreSQL (dengan *Pessimistic Locking* untuk integritas transaksi)
+- **Frontend:** Blade Templating, Bootstrap 5, Bootstrap Icons, Custom CSS Print Layout
+- **Zona Waktu & Lokalisasi:** `Asia/Jakarta` (WIB)
 
 ---
 
-## 🔐 Matriks Hak Akses Pengguna (RBAC)
+## Fitur Utama & Aturan Bisnis
 
-| Role | Cakupan Gudang | Master Data & User | Monitoring & Lokasi | Input Transaksi (`IN/OUT/MOVE`) | Laporan & Riwayat |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Super Admin** | Semua Gudang Aktif | ✅ Penuh | ✅ Lihat | ✅ Penuh | ✅ Semua Gudang |
-| **Admin Gudang** | Gudang Penugasan | ❌ | ✅ Lihat | ✅ Penuh | ✅ Gudang Tugas |
-| **Supervisor** | Gudang Penugasan | ❌ | ✅ Lihat (*Read-Only*) | ❌ (*Read-Only*) | ✅ Gudang Tugas |
-| **Petugas FG** | Gudang Penugasan | ❌ | ✅ Lihat | ✅ Penuh | ✅ Gudang Tugas |
+1. **Hierarki Master Lokasi Penyimpanan**
+   - Pengelolaan struktur bertingkat: **Unit Gudang (`WH`) → Area Penyimpanan → Unit Rak (`RAK`) → Level Rak (`Lv`)**.
+   - Pembuatan slot level rak otomatis sesuai jumlah tingkatan dan kapasitas maksimal pallet per level.
+2. **Transaksi Mutasi Pallet (`IN`, `OUT`, `MOVE`)**
+   - **IN (Barang Masuk):** Penempatan produk jadi dari lini produksi ke level rak tujuan.
+   - **MOVE (Pindah Lokasi):** Relokasi stok antar level rak dalam satu gudang.
+   - **OUT (Barang Keluar):** Pengeluaran stok untuk distribusi/pengiriman (*Delivery Order*).
+   - Konversi otomatis jumlah **Pallet** ke satuan **Karton** berdasarkan standar konversi masing-masing SKU.
+3. **Validasi Ketat & Proteksi Integritas Data**
+   - **Anti Over-Capacity:** Sistem menolak transaksi masuk/pindah apabila total pallet melebihi batas kapasitas level rak.
+   - **Single-SKU per Level (Anti Mix-SKU):** Satu level rak hanya boleh menampung satu jenis SKU produk yang sama pada satu waktu.
+   - **Concurrency Control:** Menggunakan `DB::transaction()` dan `lockForUpdate()` untuk mencegah selisih stok saat transaksi bersamaan.
+4. **Monitoring Kapasitas & Laporan Siap Cetak**
+   - Visualisasi okupansi rak dan detail lokasi produk aktif.
+   - Laporan **Stok & Lokasi Produk** serta **Riwayat Transaksi** lengkap dengan filter gudang, tipe mutasi, rentang tanggal, pencarian SKU, dan format cetak resmi (`Print-Ready`).
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## Matriks Hak Akses Pengguna (RBAC)
 
-* **Backend Framework:** Laravel 13 (PHP 8.5)
-* **Database:** PostgreSQL
-* **Frontend & UI:** Blade Templating Engine, Bootstrap 5.3, Bootstrap Icons, Custom Enterprise CSS (`indofood-wms.css`)
-* **Keamanan & Concurrency:** Laravel Auth Middleware, Role-Based Access Control (RBAC), Database Transaction & Row-Level Locking (`lockForUpdate`)
+| Role | Cakupan Gudang | Master Data | Transaksi (`IN/OUT/MOVE`) | Monitoring & Laporan | Cetak Laporan |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Super Admin** | Global (Semua Gudang) | Penuh | Penuh | Semua Gudang | Ya |
+| **Admin Gudang** | Terkunci 1 Gudang | Sesuai Gudang | Penuh | Gudang Terkait | Ya |
+| **Petugas FG** | Terkunci 1 Gudang | Tidak Ada | Penuh | Gudang Terkait | Ya |
+| **Supervisor** | Terkunci 1 Gudang | Tidak Ada | *Read-Only* (Pantau) | Gudang Terkait | Ya |
 
 ---
 
-## 🚀 Panduan Instalasi Lokal
+## Struktur Entitas Database
 
-1. **Clone repository ini**
+- `warehouses` — Master unit gudang (*Finished Goods Utama, Ekspor, dll.*)
+- `areas` — Pembagian zona penyimpanan di dalam gudang
+- `racks` & `rack_levels` — Unit rak beserta konfigurasi level dan kapasitas pallet
+- `categories` & `products` — Master kategori dan SKU produk beserta rasio karton/pallet
+- `storage_placements` — Saldo stok aktual yang menempati setiap level rak
+- `storage_transactions` — Riwayat lengkap seluruh aktivitas mutasi (`IN`, `OUT`, `MOVE`)
+- `users` — Akun pengguna beserta peran (`role`) dan penugasan gudang (`warehouse_id`)
+
+---
+
+## Panduan Instalasi Lokal
+
+1. **Clone repositori**
    ```bash
-   https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git
- 
+   git clone [https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git](https://github.com/Marwann-styd/LARAVEL-KULIYEHH.git)
+   cd LARAVEL-KULIYEHH
+   ```
+
+2. **Install dependensi PHP**
+   ```bash
+   composer install
+   ```
+
+3. **Konfigurasi environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Sesuaikan koneksi database PostgreSQL dan zona waktu di file `.env`:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=warehouse_fg
+   DB_USERNAME=postgres
+   DB_PASSWORD=your_password
+
+   APP_TIMEZONE=Asia/Jakarta
+   ```
+
+4. **Migrasi database & jalankan aplikasi**
+   ```bash
+   php artisan migrate --seed
+   php artisan serve
+   ```
+   Akses aplikasi melalui browser di `http://127.0.0.1:8000`.
+
+---
+
+## Pengembang
+
+- **Marwan Setyadi** — Mahasiswa Teknik Informatika (Proyek Kerja Praktik)
+- **Repositori:** [github.com/Marwann-styd/LARAVEL-KULIYEHH](https://github.com/Marwann-styd/LARAVEL-KULIYEHH)
