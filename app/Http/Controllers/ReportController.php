@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\StoragePlacement;
+use App\Models\user;
 use App\Models\Warehouse;
 use App\Models\Category;
 use App\Models\StorageTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -33,7 +35,7 @@ class ReportController extends Controller
      */
     public function stockLocation(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Daftar gudang sesuai hak akses pengguna.
         $warehouses = $this->getWarehouseQuery($user)
@@ -191,7 +193,7 @@ class ReportController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Daftar gudang sesuai hak akses.
         $warehouses = $this->getWarehouseQuery($user)
@@ -228,40 +230,40 @@ class ReportController extends Controller
                             );
                     })
 
-                    // Barang keluar: gudang asal.
-                    ->orWhere(function ($out) use ($warehouseId) {
-                        $out->where('transaction_type', 'OUT')
-                            ->whereHas(
-                                'fromRackLevel.rack.area.warehouse',
-                                function ($warehouseQuery) use ($warehouseId) {
-                                    $warehouseQuery
-                                        ->where('warehouses.id', $warehouseId)
-                                        ->where('warehouses.is_active', true);
-                                }
-                            );
-                    })
+                        // Barang keluar: gudang asal.
+                        ->orWhere(function ($out) use ($warehouseId) {
+                            $out->where('transaction_type', 'OUT')
+                                ->whereHas(
+                                    'fromRackLevel.rack.area.warehouse',
+                                    function ($warehouseQuery) use ($warehouseId) {
+                                        $warehouseQuery
+                                            ->where('warehouses.id', $warehouseId)
+                                            ->where('warehouses.is_active', true);
+                                    }
+                                );
+                        })
 
-                    // Pindah lokasi: asal dan tujuan harus
-                    // berada di gudang pengguna yang sama.
-                    ->orWhere(function ($move) use ($warehouseId) {
-                        $move->where('transaction_type', 'MOVE')
-                            ->whereHas(
-                                'fromRackLevel.rack.area.warehouse',
-                                function ($warehouseQuery) use ($warehouseId) {
-                                    $warehouseQuery
-                                        ->where('warehouses.id', $warehouseId)
-                                        ->where('warehouses.is_active', true);
-                                }
-                            )
-                            ->whereHas(
-                                'toRackLevel.rack.area.warehouse',
-                                function ($warehouseQuery) use ($warehouseId) {
-                                    $warehouseQuery
-                                        ->where('warehouses.id', $warehouseId)
-                                        ->where('warehouses.is_active', true);
-                                }
-                            );
-                    });
+                        // Pindah lokasi: asal dan tujuan harus
+                        // berada di gudang pengguna yang sama.
+                        ->orWhere(function ($move) use ($warehouseId) {
+                            $move->where('transaction_type', 'MOVE')
+                                ->whereHas(
+                                    'fromRackLevel.rack.area.warehouse',
+                                    function ($warehouseQuery) use ($warehouseId) {
+                                        $warehouseQuery
+                                            ->where('warehouses.id', $warehouseId)
+                                            ->where('warehouses.is_active', true);
+                                    }
+                                )
+                                ->whereHas(
+                                    'toRackLevel.rack.area.warehouse',
+                                    function ($warehouseQuery) use ($warehouseId) {
+                                        $warehouseQuery
+                                            ->where('warehouses.id', $warehouseId)
+                                            ->where('warehouses.is_active', true);
+                                    }
+                                );
+                        });
                 });
             }
         }
@@ -351,7 +353,7 @@ class ReportController extends Controller
 
         // Daftar transaksi.
         $transactions = $query
-            ->orderByDesc('transaction_date')
+            ->oldest('id')
             ->paginate(10)
             ->withQueryString();
 

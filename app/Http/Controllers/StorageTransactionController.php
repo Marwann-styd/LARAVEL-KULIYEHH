@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Product;
 use App\Models\RackLevel;
 use App\Models\StoragePlacement;
 use App\Models\StorageTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -19,7 +21,7 @@ class StorageTransactionController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $query = StorageTransaction::with([
             'product',
@@ -53,49 +55,49 @@ class StorageTransactionController extends Controller
                             );
                     })
 
-                    // Barang keluar: lokasi asal harus milik gudang pengguna.
-                    ->orWhere(function ($out) use ($warehouseId) {
-                        $out->where('transaction_type', 'OUT')
-                            ->whereHas(
-                                'fromRackLevel.rack.area',
-                                function ($area) use ($warehouseId) {
-                                    $area->where(
-                                        'warehouse_id',
-                                        $warehouseId
-                                    );
-                                }
-                            );
-                    })
+                        // Barang keluar: lokasi asal harus milik gudang pengguna.
+                        ->orWhere(function ($out) use ($warehouseId) {
+                            $out->where('transaction_type', 'OUT')
+                                ->whereHas(
+                                    'fromRackLevel.rack.area',
+                                    function ($area) use ($warehouseId) {
+                                        $area->where(
+                                            'warehouse_id',
+                                            $warehouseId
+                                        );
+                                    }
+                                );
+                        })
 
-                    // Pindah lokasi: asal DAN tujuan harus
-                    // berada di gudang pengguna yang sama.
-                    ->orWhere(function ($move) use ($warehouseId) {
-                        $move->where('transaction_type', 'MOVE')
-                            ->whereHas(
-                                'fromRackLevel.rack.area',
-                                function ($area) use ($warehouseId) {
-                                    $area->where(
-                                        'warehouse_id',
-                                        $warehouseId
-                                    );
-                                }
-                            )
-                            ->whereHas(
-                                'toRackLevel.rack.area',
-                                function ($area) use ($warehouseId) {
-                                    $area->where(
-                                        'warehouse_id',
-                                        $warehouseId
-                                    );
-                                }
-                            );
-                    });
+                        // Pindah lokasi: asal DAN tujuan harus
+                        // berada di gudang pengguna yang sama.
+                        ->orWhere(function ($move) use ($warehouseId) {
+                            $move->where('transaction_type', 'MOVE')
+                                ->whereHas(
+                                    'fromRackLevel.rack.area',
+                                    function ($area) use ($warehouseId) {
+                                        $area->where(
+                                            'warehouse_id',
+                                            $warehouseId
+                                        );
+                                    }
+                                )
+                                ->whereHas(
+                                    'toRackLevel.rack.area',
+                                    function ($area) use ($warehouseId) {
+                                        $area->where(
+                                            'warehouse_id',
+                                            $warehouseId
+                                        );
+                                    }
+                                );
+                        });
                 });
             }
         }
 
         $transactions = $query
-            ->latest('transaction_date')
+            ->oldest('id')
             ->paginate(10);
 
         return view('transactions.index', compact('transactions'));
@@ -107,7 +109,7 @@ class StorageTransactionController extends Controller
 
     public function create()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Master produk digunakan bersama oleh kedua gudang.
         $products = Product::where('is_active', true)
@@ -195,7 +197,7 @@ class StorageTransactionController extends Controller
             ],
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
 
         try {
 
@@ -301,7 +303,6 @@ class StorageTransactionController extends Controller
                             'pallet_quantity',
                             $quantity
                         );
-
                     } else {
 
                         StoragePlacement::create([
@@ -341,7 +342,6 @@ class StorageTransactionController extends Controller
                     if ($quantity == $placement->pallet_quantity) {
 
                         $placement->delete();
-
                     } else {
 
                         $placement->decrement(
@@ -408,7 +408,6 @@ class StorageTransactionController extends Controller
                     if ($quantity == $source->pallet_quantity) {
 
                         $source->delete();
-
                     } else {
 
                         $source->decrement(
@@ -424,7 +423,6 @@ class StorageTransactionController extends Controller
                             'pallet_quantity',
                             $quantity
                         );
-
                     } else {
 
                         StoragePlacement::create([
@@ -452,7 +450,6 @@ class StorageTransactionController extends Controller
                     'transaction_date' => now(),
                     'description' => $validated['description'] ?? null,
                 ]);
-
             }, 3);
 
             return redirect()
@@ -461,7 +458,6 @@ class StorageTransactionController extends Controller
                     'success',
                     'Transaksi penyimpanan berhasil disimpan.'
                 );
-
         } catch (\RuntimeException $e) {
 
             return back()
@@ -469,7 +465,6 @@ class StorageTransactionController extends Controller
                 ->withErrors([
                     'transaction' => $e->getMessage(),
                 ]);
-
         } catch (\Throwable $e) {
 
             report($e);
@@ -478,7 +473,7 @@ class StorageTransactionController extends Controller
                 ->withInput()
                 ->withErrors([
                     'transaction' =>
-                        'Terjadi kesalahan saat menyimpan transaksi. Silakan periksa kembali data dan coba lagi.',
+                    'Terjadi kesalahan saat menyimpan transaksi. Silakan periksa kembali data dan coba lagi.',
                 ]);
         }
     }
@@ -516,7 +511,7 @@ class StorageTransactionController extends Controller
     // 5. MEMERIKSA HAK AKSES LOKASI
     // ==========================================
 
-    private function ensureLevelAccessible(RackLevel $level, $user)
+    private function ensureLevelAccessible(RackLevel $level, user $user)
     {
         $this->ensureLevelActive($level);
 

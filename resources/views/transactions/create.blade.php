@@ -69,15 +69,15 @@
                     <div class="row g-3 mb-4">
                         {{-- LOKASI ASAL (OUT & MOVE) --}}
                         <div class="col-md-6" id="sourceWrapper">
-                            <label for="source_level_id" class="wms-form-label">Lokasi Asal (Rak / Level) <span class="text-danger">*</span></label>
-                            <select name="source_level_id" id="source_level_id" class="form-select wms-control">
+                            <label for="from_rack_level_id" class="wms-form-label">Lokasi Asal (Rak / Level) <span class="text-danger">*</span></label>
+                            <select name="from_rack_level_id" id="from_rack_level_id" class="form-select wms-control">
                                 <option value="">-- Pilih Lokasi Asal --</option>
                                 @foreach($rackLevels as $level)
                                     @php
                                         $occupied = $level->storagePlacement->pallet_quantity ?? 0;
                                         $skuLabel = $level->storagePlacement?->product?->product_code ?? 'Kosong';
                                     @endphp
-                                    <option value="{{ $level->id }}" {{ (string) old('source_level_id') === (string) $level->id ? 'selected' : '' }}>
+                                    <option value="{{ $level->id }}" {{ (string) old('from_rack_level_id') === (string) $level->id ? 'selected' : '' }}>
                                         {{ $level->rack->area->warehouse->warehouse_code ?? '' }} | {{ $level->rack->rack_code }} - Lv.{{ $level->level_number }} (Isi: {{ $occupied }} Plt - {{ $skuLabel }})
                                     </option>
                                 @endforeach
@@ -87,15 +87,15 @@
 
                         {{-- LOKASI TUJUAN (IN & MOVE) --}}
                         <div class="col-md-6" id="destinationWrapper">
-                            <label for="destination_level_id" class="wms-form-label">Lokasi Tujuan (Rak / Level) <span class="text-danger">*</span></label>
-                            <select name="destination_level_id" id="destination_level_id" class="form-select wms-control">
+                            <label for="to_rack_level_id" class="wms-form-label">Lokasi Tujuan (Rak / Level) <span class="text-danger">*</span></label>
+                            <select name="to_rack_level_id" id="to_rack_level_id" class="form-select wms-control">
                                 <option value="">-- Pilih Lokasi Tujuan --</option>
                                 @foreach($rackLevels as $level)
                                     @php
                                         $occupied = $level->storagePlacement->pallet_quantity ?? 0;
                                         $remaining = max(0, $level->capacity_pallets - $occupied);
                                     @endphp
-                                    <option value="{{ $level->id }}" {{ (string) old('destination_level_id') === (string) $level->id ? 'selected' : '' }}>
+                                    <option value="{{ $level->id }}" {{ (string) old('to_rack_level_id') === (string) $level->id ? 'selected' : '' }}>
                                         {{ $level->rack->area->warehouse->warehouse_code ?? '' }} | {{ $level->rack->rack_code }} - Lv.{{ $level->level_number }} (Sisa: {{ $remaining }}/{{ $level->capacity_pallets }} Plt)
                                     </option>
                                 @endforeach
@@ -117,7 +117,7 @@
 
                         <div class="col-12">
                             <label for="notes" class="wms-form-label">Catatan Operasional (Opsional)</label>
-                            <textarea name="notes" id="notes" rows="2" class="form-control"
+                            <textarea name="description" id="notes" rows="2" class="form-control"
                                       placeholder="Nomor surat jalan, batch produksi, atau keterangan shift...">{{ old('notes') }}</textarea>
                         </div>
                     </div>
@@ -172,8 +172,8 @@
     const typeSelect = document.getElementById('transaction_type');
     const sourceWrap = document.getElementById('sourceWrapper');
     const destWrap = document.getElementById('destinationWrapper');
-    const sourceSelect = document.getElementById('source_level_id');
-    const destSelect = document.getElementById('destination_level_id');
+    const sourceSelect = document.getElementById('from_rack_level_id');
+    const destSelect = document.getElementById('to_rack_level_id');
     const typeHelp = document.getElementById('typeHelpText');
 
     const productSelect = document.getElementById('product_id');
