@@ -12,7 +12,7 @@ class WarehouseController extends Controller
     public function index()
     {
         $warehouses = Warehouse::withCount('areas')
-            ->latest()
+            ->oldest()
             ->paginate(10);
 
         return view('warehouses.index', compact('warehouses'));

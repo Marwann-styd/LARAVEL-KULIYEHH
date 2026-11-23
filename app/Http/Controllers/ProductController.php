@@ -13,7 +13,7 @@ class ProductController extends Controller
     {
         $products = Product::with('category')
             ->withCount('storagePlacements')
-            ->latest()
+            ->oldest()
             ->paginate(10);
 
         $totalAktif = product::where('is_active', true)->count();

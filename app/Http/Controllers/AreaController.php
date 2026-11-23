@@ -23,7 +23,7 @@ class AreaController extends Controller
         }
 
         $areas = $query
-            ->latest()
+            ->oldest()
             ->paginate(10)
             ->withQueryString();
 

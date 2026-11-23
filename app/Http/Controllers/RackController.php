@@ -29,7 +29,7 @@ class RackController extends Controller
         }
 
         $racks = $query
-            ->latest()
+            ->oldest()
             ->paginate(10)
             ->withQueryString();
 

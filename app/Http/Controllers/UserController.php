@@ -13,7 +13,7 @@ class UserController extends Controller
     // Menampilkan daftar pengguna
     public function index(Request $request)
     {
-        $query = User::with('warehouse')->latest();
+        $query = User::with('warehouse')->oldest();
 
         if ($request->filled('search')) {
             $search = $request->search;
