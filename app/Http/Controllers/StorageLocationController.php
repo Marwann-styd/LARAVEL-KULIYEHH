@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\StoragePlacement;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StorageLocationController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Query utama lokasi penyimpanan
         $query = StoragePlacement::with([
