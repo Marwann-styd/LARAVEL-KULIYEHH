@@ -18,47 +18,46 @@ use App\Models\StorageTransaction;
 
 
 // Halaman utama
-    Route::get('/', function () {
+Route::get('/', function () {
     return redirect()->route('login');
 });
 
 // Pengguna yang belum login
-    Route::middleware('guest')->group(function () {
+Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])
         ->name('login');
 
     Route::post('/login', [AuthController::class, 'login'])
         ->name('login.process');
-
 });
 
 // Pengguna yang sudah login
-        Route::middleware(['auth', 'active'])->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     // Dashboard
-        Route::get('/dashboard', [DashboardController::class, 'index'])
+    Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
         ->name('dashboard');
-    
-     // Monitoring Kapasitas
-        Route::get('/monitoring-capacity', [MonitoringCapacityController::class, 'index'])
+
+    // Monitoring Kapasitas
+    Route::get('/monitoring-capacity', [MonitoringCapacityController::class, 'index'])
         ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
         ->name('monitoring.index');
 
     // Monitoring Lokasi Produk
-        Route::get('/storage-locations', [StorageLocationController::class, 'index'])
+    Route::get('/storage-locations', [StorageLocationController::class, 'index'])
         ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
         ->name('storage-locations.index');
 
     // Laporan Stok Produk berdasarkan Lokasi
-        Route::get('/reports/stock-location', [ReportController::class, 'stockLocation'])
+    Route::get('/reports/stock-location', [ReportController::class, 'stockLocation'])
         ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
         ->name('reports.stock-location');
 
     // Laporan Riwayat Transaksi
-       Route::get('/reports/transactions', [ReportController::class, 'transactionHistory'])
-       ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
-       ->name('reports.transactions');
+    Route::get('/reports/transactions', [ReportController::class, 'transactionHistory'])
+        ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
+        ->name('reports.transactions');
 
     // Riwayat Transaksi Penyimpanan (Semua Role)
     Route::get('/transactions', [StorageTransactionController::class, 'index'])
@@ -73,6 +72,21 @@ use App\Models\StorageTransaction;
 
             Route::post('/transactions', [StorageTransactionController::class, 'store'])
                 ->name('transactions.store');
+        });
+
+    // Daftar & Audit Barang Rusak / Bad Stock (Semua Role)
+    Route::get('/damaged-stocks', [App\Http\Controllers\DamagedStockController::class, 'index'])
+        ->middleware('role:super_admin,admin_gudang,petugas_fg,supervisor')
+        ->name('damaged-stocks.index');
+
+    // Input Barang Rusak + Kamera Bukti (Khusus Pelaksana & Super Admin)
+    Route::middleware(['role:petugas_fg'])
+        ->group(function () {
+            Route::get('/damaged-stocks/create', [App\Http\Controllers\DamagedStockController::class, 'create'])
+                ->name('damaged-stocks.create');
+
+            Route::post('/damaged-stocks', [App\Http\Controllers\DamagedStockController::class, 'store'])
+                ->name('damaged-stocks.store');
         });
 
     // Pengelolaan Master Gudang
@@ -102,8 +116,8 @@ use App\Models\StorageTransaction;
         Route::patch('/users/{user}/status', [UserController::class, 'toggleStatus'])
             ->name('users.toggle-status');
 
-    
-    // Pengelolaan Master Area
+
+        // Pengelolaan Master Area
         Route::get('/areas', [AreaController::class, 'index'])
             ->name('areas.index');
 
@@ -125,7 +139,7 @@ use App\Models\StorageTransaction;
         Route::delete('/areas/{area}', [AreaController::class, 'destroy'])
             ->name('areas.destroy');
 
-        
+
         // Pengelolaan Master Rak dan Level
         Route::get('/racks', [RackController::class, 'index'])
             ->name('racks.index');
@@ -150,9 +164,9 @@ use App\Models\StorageTransaction;
 
         Route::delete('/racks/{rack}', [RackController::class, 'destroy'])
             ->name('racks.destroy');
-            
 
-    // Pengelolaan Master Kategori Produk
+
+        // Pengelolaan Master Kategori Produk
         Route::get('/categories', [CategoryController::class, 'index'])
             ->name('categories.index');
 
@@ -174,9 +188,9 @@ use App\Models\StorageTransaction;
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
             ->name('categories.destroy');
 
-        
-    
-    // Pengelolaan Master Produk
+
+
+        // Pengelolaan Master Produk
         Route::get('/products', [ProductController::class, 'index'])
             ->name('products.index');
 
@@ -216,11 +230,9 @@ use App\Models\StorageTransaction;
 
         Route::delete('/users/{user}', [UserController::class, 'destroy'])
             ->name('users.destroy');
-
     });
 
     // Logout
-        Route::post('/logout', [AuthController::class, 'logout'])
+    Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
-
 });

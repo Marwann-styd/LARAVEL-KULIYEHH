@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk Sistem Warehouse FG PT Indofood</title>
+    <title>Masuk — Warehouse FG PT Indofood</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
@@ -14,7 +14,6 @@
     <style>
         :root {
             --indo-navy: #0E2340;
-            --indo-navy-deep: #09182D;
             --indo-blue: #00529B;
             --indo-blue-hover: #003F78;
             --indo-red: #D71920;
@@ -37,19 +36,31 @@
             padding: 24px 16px;
         }
 
+        @keyframes cardFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .login-shell {
             width: 100%;
-            max-width: 1020px;
+            max-width: 840px;
             background: #FFFFFF;
             border: 1px solid var(--border-crisp);
             border-radius: 14px;
             overflow: hidden;
             display: grid;
-            grid-template-columns: 1.08fr 0.92fr;
-            box-shadow: 0 18px 45px rgba(14, 35, 64, 0.14);
+            grid-template-columns: 0.92fr 1.08fr;
+            box-shadow: 0 18px 45px rgba(14, 35, 64, 0.12);
+            animation: cardFadeUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Top Indofood Corporate Accent Strip */
         .login-shell::before {
             content: "";
             grid-column: 1 / -1;
@@ -57,116 +68,61 @@
             background: linear-gradient(90deg, var(--indo-red) 0%, var(--indo-red) 32%, var(--indo-blue) 32%, #1B75C9 100%);
         }
 
-        /* Left Corporate Brand Panel */
         .brand-side {
             background: var(--indo-navy);
             color: #FFFFFF;
-            padding: 44px 42px;
+            padding: 40px 36px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .brand-logo-box {
             display: inline-flex;
             align-items: center;
             background: #FFFFFF;
-            padding: 11px 16px;
+            padding: 10px 15px;
             border-radius: 9px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            transition: transform 0.2s ease;
+        }
+
+        .brand-logo-box:hover {
+            transform: translateY(-2px);
         }
 
         .brand-logo-box img {
-            width: 175px;
+            width: 155px;
             max-width: 100%;
             height: auto;
             object-fit: contain;
         }
 
-        .system-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 34px;
-            padding: 5px 11px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 6px;
-            color: #9EC5EC;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        .system-tag-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--indo-red);
-        }
-
         .brand-heading {
-            margin: 16px 0 14px;
-            font-size: clamp(26px, 3vw, 34px);
+            margin: 28px 0 10px;
+            font-size: 26px;
             font-weight: 800;
-            line-height: 1.18;
-            letter-spacing: -0.025em;
+            line-height: 1.22;
+            letter-spacing: -0.02em;
         }
 
         .brand-desc {
-            color: #BFD3E8;
-            font-size: 13.5px;
-            line-height: 1.7;
-            margin: 0 0 28px;
-            max-width: 410px;
-        }
-
-        .module-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .module-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 13px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 8px;
-            font-size: 12.5px;
-            color: #E2ECF7;
-        }
-
-        .module-item i {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            background: var(--indo-blue);
-            color: #FFFFFF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
+            color: #A8C2DF;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
         }
 
         .brand-bottom {
             margin-top: 32px;
-            padding-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.10);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             font-size: 11.5px;
             color: #8CA9C9;
         }
 
-        /* Right Form Panel */
         .form-side {
-            padding: 44px 40px;
+            padding: 40px 38px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -174,11 +130,11 @@
         }
 
         .form-header {
-            margin-bottom: 26px;
+            margin-bottom: 24px;
         }
 
         .form-header h2 {
-            margin: 0 0 6px;
+            margin: 0 0 4px;
             color: var(--indo-navy);
             font-size: 22px;
             font-weight: 800;
@@ -198,11 +154,17 @@
             margin-bottom: 6px;
         }
 
+        .input-group {
+            transition: box-shadow 0.18s ease;
+            border-radius: 0.375rem;
+        }
+
         .input-group-text {
             background: #F8FAFC;
             border: 1px solid var(--border-crisp);
             border-right: none;
             color: #64748B;
+            transition: border-color 0.18s ease, color 0.18s ease;
         }
 
         .form-control {
@@ -212,6 +174,7 @@
             font-size: 13.5px;
             color: #0F233C;
             box-shadow: none !important;
+            transition: border-color 0.18s ease;
         }
 
         .form-control:focus {
@@ -220,7 +183,11 @@
 
         .input-group:focus-within {
             box-shadow: 0 0 0 3px rgba(0, 82, 155, 0.12);
-            border-radius: 0.375rem;
+        }
+
+        .input-group:focus-within .input-group-text {
+            border-color: var(--indo-blue);
+            color: var(--indo-blue);
         }
 
         .password-toggle {
@@ -229,10 +196,20 @@
             border-left: none;
             color: #64748B;
             padding: 0 14px;
+            transition: color 0.15s ease, border-color 0.18s ease;
+        }
+
+        .input-group:focus-within .password-toggle {
+            border-color: var(--indo-blue);
         }
 
         .password-toggle:hover {
             color: var(--indo-blue);
+        }
+
+        .form-check-input {
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
         .form-check-input:checked {
@@ -241,14 +218,14 @@
         }
 
         .btn-indo-submit {
-            min-height: 46px;
+            min-height: 44px;
             background: var(--indo-blue);
             border: 1px solid var(--indo-blue);
             border-radius: 8px;
             color: #FFFFFF;
             font-size: 14px;
             font-weight: 700;
-            transition: background-color 0.15s ease;
+            transition: transform 0.14s ease, background-color 0.16s ease, box-shadow 0.16s ease;
         }
 
         .btn-indo-submit:hover,
@@ -256,35 +233,40 @@
             background: var(--indo-blue-hover);
             border-color: var(--indo-blue-hover);
             color: #FFFFFF;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 82, 155, 0.24);
+        }
+
+        .btn-indo-submit:active {
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+
+        .btn-indo-submit:disabled {
+            opacity: 0.85;
+            transform: none;
+            cursor: not-allowed;
         }
 
         .form-footer {
-            margin-top: 28px;
-            padding-top: 16px;
-            border-top: 1px solid #EDF2F7;
+            margin-top: 22px;
             text-align: center;
             color: #94A3B8;
             font-size: 11.5px;
         }
 
-        @media (max-width: 850px) {
+        @media (max-width: 768px) {
             .login-shell {
-                max-width: 460px;
+                max-width: 440px;
                 grid-template-columns: 1fr;
             }
 
             .brand-side {
-                padding: 30px 26px;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            }
-
-            .system-tag {
-                margin-top: 22px;
+                padding: 28px 24px;
             }
 
             .form-side {
-                padding: 32px 26px;
+                padding: 30px 24px;
             }
         }
     </style>
@@ -292,53 +274,27 @@
 
 <body>
     <main class="login-shell">
-        {{-- PANEL IDENTITAS PT INDOFOOD --}}
         <section class="brand-side">
             <div>
                 <div class="brand-logo-box">
                     <img src="{{ asset('images/indofood-logo.svg') }}" alt="PT Indofood">
                 </div>
 
-                <div>
-                    <span class="system-tag">
-                        <span class="system-tag-dot"></span>
-                        Warehouse Management System
-                    </span>
-                </div>
-
                 <h1 class="brand-heading">Warehouse Finished Goods</h1>
                 <p class="brand-desc">
-                    Sistem operasional terintegrasi untuk pemantauan kapasitas pallet, penempatan rak, serta pencatatan
-                    mutasi produk jadi.
+                    Sistem Manajemen Penyimpanan & Inventori Produk Jadi.
                 </p>
-
-                <div class="module-list">
-                    <div class="module-item">
-                        <i class="bi bi-speedometer2"></i>
-                        <span>Monitoring Kapasitas & Utilisasi Rak Real-Time</span>
-                    </div>
-                    <div class="module-item">
-                        <i class="bi bi-geo-alt"></i>
-                        <span>Pemetaan Lokasi Penyimpanan Pallet & Karton</span>
-                    </div>
-                    <div class="module-item">
-                        <i class="bi bi-arrow-left-right"></i>
-                        <span>Kontrol Transaksi Masuk, Keluar & Pindah Rak</span>
-                    </div>
-                </div>
             </div>
 
             <div class="brand-bottom">
-                <span>PT Indofood &bull; Finished Goods Division</span>
-                <span>v1.0 Enterprise</span>
+                PT Indofood &bull; Internal Warehouse System
             </div>
         </section>
 
-        {{-- PANEL AUTENTIKASI --}}
         <section class="form-side">
             <div class="form-header">
-                <h2>Masuk ke Sistem</h2>
-                <p>Gunakan akun operasional yang terdaftar pada sistem gudang.</p>
+                <h2>Masuk</h2>
+                <p>Silakan masuk menggunakan akun gudang Anda.</p>
             </div>
 
             @if ($errors->any())
@@ -347,11 +303,11 @@
                 </div>
             @endif
 
-            <form action="{{ route('login.process') }}" method="POST">
+            <form action="{{ route('login.process') }}" method="POST" id="loginForm">
                 @csrf
 
                 <div class="mb-3">
-                    <label class="form-label" for="email">Alamat Email</label>
+                    <label class="form-label" for="email">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input type="email" id="email" name="email" class="form-control"
@@ -375,17 +331,16 @@
 
                 <div class="form-check mb-4">
                     <input type="checkbox" name="remember" value="1" class="form-check-input" id="remember">
-                    <label class="form-check-label small text-secondary" for="remember">Pertahankan sesi masuk</label>
+                    <label class="form-check-label small text-secondary" for="remember">Ingat saya</label>
                 </div>
 
-                <button type="submit" class="btn btn-indo-submit w-100">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Masuk ke Dashboard
+                <button type="submit" class="btn btn-indo-submit w-100" id="submitBtn">
+                    Masuk
                 </button>
             </form>
 
             <div class="form-footer">
-                Warehouse Finished Goods Monitoring System &copy; {{ date('Y') }}<br>
-                Akses Terbatas PT Indofood
+                &copy; {{ date('Y') }} PT Indofood &mdash; Warehouse Finished Goods
             </div>
         </section>
     </main>
@@ -393,12 +348,20 @@
     <script>
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
 
         togglePassword.addEventListener('click', function() {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
             this.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
             this.setAttribute('aria-label', isPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+        });
+
+        loginForm.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses...';
         });
     </script>
 </body>

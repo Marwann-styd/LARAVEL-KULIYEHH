@@ -9,6 +9,7 @@ use App\Models\Rack;
 use App\Models\Product;
 use App\Models\RackLevel;
 use App\Models\StoragePlacement;
+use App\Models\DamagedStock;
 
 class DashboardController extends Controller
 {
@@ -108,18 +109,29 @@ class DashboardController extends Controller
             $totalKapasitasPallet - $totalPalletTerisi
         );
 
-        // Total karton terisi berdasarkan kapasitas masing-masing produk.
+        // Total karton bersih terisi (dikurangi dus rusak/bocor).
         $totalKartonTerisi = (int) $placements->sum(function ($placement) {
-            return $placement->pallet_quantity *
-                ($placement->product->cartons_per_pallet ?? 120);
+            $gross = $placement->pallet_quantity * ($placement->product->cartons_per_pallet ?? 120);
+            return max(0, $gross - ($placement->damaged_cartons ?? 0));
         });
 
         // Estimasi kapasitas karton: 120 karton per pallet.
         $totalKapasitasKarton = $totalKapasitasPallet * 120;
 
+        // Total dus barang rusak / bad stock dalam cakupan akses pengguna.
+        $damagedQuery = DamagedStock::when($warehouseId !== null, function ($query) use ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        });
+
+        $totalBarangRusak = (int) (clone $damagedQuery)->sum('damaged_cartons');
+
+        $recentDamagedStocks = (clone $damagedQuery)
+            ->with(['warehouse', 'rackLevel.rack', 'product', 'reporter'])
+            ->orderByDesc('reported_at')
+            ->limit(4)
+            ->get();
+
         // Ringkasan masing-masing gudang untuk dashboard.
-        // Super Admin akan mendapatkan FG-01 dan FG-02.
-        // Role lain hanya mendapatkan ringkasan gudang penugasannya.
         $warehouseSummaries = $warehouses->map(function ($warehouse) {
             $areaQuery = Area::where('is_active', true)
                 ->where('warehouse_id', $warehouse->id);
@@ -160,11 +172,14 @@ class DashboardController extends Controller
             $palletTersedia = max(0, $kapasitasPallet - $palletTerisi);
 
             $kartonTerisi = (int) $placementsGudang->sum(function ($placement) {
-                return $placement->pallet_quantity *
-                    ($placement->product->cartons_per_pallet ?? 120);
+                $gross = $placement->pallet_quantity * ($placement->product->cartons_per_pallet ?? 120);
+                return max(0, $gross - ($placement->damaged_cartons ?? 0));
             });
 
             $kapasitasKarton = $kapasitasPallet * 120;
+
+            $barangRusakGudang = (int) DamagedStock::where('warehouse_id', $warehouse->id)
+                ->sum('damaged_cartons');
 
             $persentaseTerisi = $kapasitasPallet > 0
                 ? min(100, ($palletTerisi / $kapasitasPallet) * 100)
@@ -182,6 +197,7 @@ class DashboardController extends Controller
                 'persentase_terisi' => round($persentaseTerisi, 1),
                 'kapasitas_karton' => $kapasitasKarton,
                 'karton_terisi' => $kartonTerisi,
+                'barang_rusak' => $barangRusakGudang,
             ];
         });
 
@@ -195,6 +211,8 @@ class DashboardController extends Controller
             'sisaKapasitasPallet',
             'totalKapasitasKarton',
             'totalKartonTerisi',
+            'totalBarangRusak',
+            'recentDamagedStocks',
             'warehouseSummaries'
         ));
     }
