@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@php
+    $tabRoleMap = [
+        'super_admin' => 'Super Admin',
+        'admin_gudang' => 'Admin Gudang',
+        'supervisor' => 'Supervisor',
+        'petugas_fg' => 'Petugas FG',
+    ];
+    $tabRoleName = $tabRoleMap[Auth::user()->role ?? ''] ?? 'Operasional';
+@endphp
+
+@section('title', "Dashboard ({$tabRoleName})")
 @section('page-heading', 'Dashboard')
 
 @push('styles')
