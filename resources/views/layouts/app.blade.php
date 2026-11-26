@@ -350,9 +350,18 @@
                 @yield('content')
             </main>
 
-            <footer class="wms-footer">
-                <span><strong>PT Indofood</strong> &mdash; Warehouse Finished Goods Monitoring System</span>
-                <span>&copy; {{ date('Y') }} Internal Logistics Operations</span>
+            <footer class="wms-footer mt-auto py-3 px-4 border-top bg-white" style="font-size: 12px; color: #64748B;">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                    <div>
+                        <strong style="color: var(--indo-navy);">PT Indofood CBP Sukses Makmur Tbk</strong>
+                        <span class="mx-1">&mdash;</span>
+                        <span>Warehouse Finished Goods Monitoring System (Divisi Noodle &bull; Cabang Bandung,
+                            Padalarang)</span>
+                    </div>
+                    <div class="text-muted">
+                        &copy; {{ date('Y') }} Internal Logistics Operations &bull; Jl. Raya Caringin No. 353
+                    </div>
+                </div>
             </footer>
         </div>
     </div>

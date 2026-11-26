@@ -549,7 +549,8 @@
 
                 <h1 class="brand-heading">Warehouse Finished Goods</h1>
                 <p class="brand-desc">
-                    Sistem Manajemen Penyimpanan, Okupansi Rak, &amp; Audit Inventori Produk Jadi.
+                    Sistem Manajemen Penyimpanan, Okupansi Rak, &amp; Audit Inventori Produk Jadi &mdash; <strong>Divisi
+                        Noodle Cabang Bandung Padalarang</strong>.
                 </p>
 
                 <div class="wms-feature-list">
@@ -575,12 +576,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="brand-bottom">
-                <span>PT Indofood &bull; Finished Goods WMS</span>
-                <span>RBAC v1.0</span>
-            </div>
+                <div class="brand-bottom">
+                    <span>PT Indofood CBP &bull; Divisi Noodle Padalarang</span>
+                    <span>RBAC v1.0</span>
+                </div>
         </section>
 
         <section class="form-side">
@@ -635,7 +635,7 @@
             </div>
 
             <div class="form-footer">
-                &copy; {{ date('Y') }} PT Indofood &mdash; Internal Warehouse System
+                &copy; {{ date('Y') }} PT Indofood CBP Sukses Makmur Tbk &mdash; Divisi Noodle Padalarang
             </div>
         </section>
     </main>
@@ -675,7 +675,6 @@
             <span>Membuka Command Center Gudang...</span>
         </div>
     </div>
-    </div>
 
     <script>
         const togglePassword = document.getElementById('togglePassword');
@@ -683,7 +682,6 @@
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const exitCurtain = document.getElementById('loginExitCurtain');
-        const curtainInner = document.getElementById('curtainInner');
 
         togglePassword.addEventListener('click', function() {
             const isPassword = passwordInput.type === 'password';
