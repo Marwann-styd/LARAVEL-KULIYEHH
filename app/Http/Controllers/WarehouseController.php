@@ -8,10 +8,18 @@ use Illuminate\Validation\Rule;
 
 class WarehouseController extends Controller
 {
-    // Menampilkan daftar gudang
-    public function index()
+    // Menampilkan daftar gudang (lengkap dengan pencarian)
+    public function index(Request $request)
     {
         $warehouses = Warehouse::withCount('areas')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('warehouse_code', 'ilike', "%{$search}%")
+                        ->orWhere('warehouse_name', 'ilike', "%{$search}%")
+                        ->orWhere('location', 'ilike', "%{$search}%");
+                });
+            })
             ->oldest()
             ->paginate(10);
 
@@ -38,6 +46,11 @@ class WarehouseController extends Controller
                 'required',
                 'string',
                 'max:100',
+            ],
+            'location' => [
+                'nullable',
+                'string',
+                'max:150',
             ],
             'description' => [
                 'nullable',
@@ -77,6 +90,11 @@ class WarehouseController extends Controller
                 'string',
                 'max:100',
             ],
+            'location' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
             'description' => [
                 'nullable',
                 'string',
@@ -99,10 +117,7 @@ class WarehouseController extends Controller
 
         return redirect()
             ->route('warehouses.index')
-            ->with(
-                'success',
-                'Status gudang berhasil diperbarui.'
-            );
+            ->with('success', 'Status gudang berhasil diperbarui.');
     }
 
     // Menghapus gudang yang belum memiliki area
@@ -120,5 +135,4 @@ class WarehouseController extends Controller
             ->route('warehouses.index')
             ->with('success', 'Data gudang berhasil dihapus.');
     }
-
 }

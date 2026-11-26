@@ -56,6 +56,13 @@
                             </div>
 
                             <div class="col-12">
+                                <label for="location" class="wms-form-label">Lokasi / Plant</label>
+                                <input type="text" id="location" name="location" class="form-control wms-control"
+                                    maxlength="150" placeholder="Contoh: Plant Bandung — Divisi Noodle (Padalarang)"
+                                    value="{{ old('location') }}">
+                            </div>
+
+                            <div class="col-12">
                                 <label for="location" class="wms-form-label">Lokasi / Plant Pabrik</label>
                                 <input type="text" id="location" name="location" class="form-control wms-control"
                                     placeholder="Contoh: Plant Bandung &mdash; Area Logistik Timur"
