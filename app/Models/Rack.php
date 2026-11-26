@@ -32,4 +32,9 @@ class Rack extends Model
     {
         return $this->hasMany(RackLevel::class);
     }
+
+    public function levels()
+    {
+        return $this->hasMany(RackLevel::class);
+    }
 }

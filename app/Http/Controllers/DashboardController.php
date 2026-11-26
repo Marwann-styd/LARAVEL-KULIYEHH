@@ -9,28 +9,24 @@ use App\Models\Rack;
 use App\Models\Product;
 use App\Models\RackLevel;
 use App\Models\StoragePlacement;
+use App\Models\StorageTransaction;
 use App\Models\DamagedStock;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth::user();
+        $user = Auth::user();
 
-        // Pengamanan akun non-Super Admin.
-        // Pengguna wajib memiliki penugasan gudang.
         if ($user->role !== 'super_admin' && $user->warehouse_id === null) {
             abort(403, 'Akun Anda belum ditetapkan ke gudang.');
         }
 
-        // Super Admin melihat seluruh gudang aktif.
-        // Role lainnya hanya melihat gudang penugasannya.
         $warehouseId = $user->role === 'super_admin'
             ? null
             : $user->warehouse_id;
 
-        // Ambil daftar gudang untuk ringkasan per gudang.
-        // Nama kolom mengikuti struktur database: warehouse_name.
         $warehouses = Warehouse::where('is_active', true)
             ->when($warehouseId !== null, function ($query) use ($warehouseId) {
                 $query->where('id', $warehouseId);
@@ -42,39 +38,29 @@ class DashboardController extends Controller
                 'warehouse_name',
             ]);
 
-        // Total gudang aktif dalam cakupan akses pengguna.
         $totalGudang = $warehouses->count();
 
-        // Total area aktif.
         $areaQuery = Area::where('is_active', true);
-
         if ($warehouseId !== null) {
             $areaQuery->where('warehouse_id', $warehouseId);
         }
-
         $totalArea = $areaQuery->count();
 
-        // Total rak aktif berdasarkan area aktif.
         $rackQuery = Rack::where('is_active', true)
             ->whereHas('area', function ($query) use ($warehouseId) {
                 $query->where('is_active', true);
-
                 if ($warehouseId !== null) {
                     $query->where('warehouse_id', $warehouseId);
                 }
             });
 
         $totalRak = $rackQuery->count();
-
-        // Master produk digunakan bersama oleh seluruh gudang.
         $totalProduk = Product::where('is_active', true)->count();
 
-        // Kapasitas pallet berdasarkan level rak aktif.
         $rackLevelQuery = RackLevel::whereHas('rack', function ($query) use ($warehouseId) {
             $query->where('is_active', true)
                 ->whereHas('area', function ($areaQuery) use ($warehouseId) {
                     $areaQuery->where('is_active', true);
-
                     if ($warehouseId !== null) {
                         $areaQuery->where('warehouse_id', $warehouseId);
                     }
@@ -83,14 +69,12 @@ class DashboardController extends Controller
 
         $totalKapasitasPallet = (int) $rackLevelQuery->sum('capacity_pallets');
 
-        // Placement hanya pada level rak di gudang yang sesuai.
-        $placementQuery = StoragePlacement::with('product')
+        $placementQuery = StoragePlacement::with('product.category')
             ->whereHas('rackLevel', function ($query) use ($warehouseId) {
                 $query->whereHas('rack', function ($rackQuery) use ($warehouseId) {
                     $rackQuery->where('is_active', true)
                         ->whereHas('area', function ($areaQuery) use ($warehouseId) {
                             $areaQuery->where('is_active', true);
-
                             if ($warehouseId !== null) {
                                 $areaQuery->where('warehouse_id', $warehouseId);
                             }
@@ -99,26 +83,16 @@ class DashboardController extends Controller
             });
 
         $placements = $placementQuery->get();
-
-        // Total pallet terisi.
         $totalPalletTerisi = (int) $placements->sum('pallet_quantity');
+        $sisaKapasitasPallet = max(0, $totalKapasitasPallet - $totalPalletTerisi);
 
-        // Sisa kapasitas pallet.
-        $sisaKapasitasPallet = max(
-            0,
-            $totalKapasitasPallet - $totalPalletTerisi
-        );
-
-        // Total karton bersih terisi (dikurangi dus rusak/bocor).
         $totalKartonTerisi = (int) $placements->sum(function ($placement) {
             $gross = $placement->pallet_quantity * ($placement->product->cartons_per_pallet ?? 120);
             return max(0, $gross - ($placement->damaged_cartons ?? 0));
         });
 
-        // Estimasi kapasitas karton: 120 karton per pallet.
         $totalKapasitasKarton = $totalKapasitasPallet * 120;
 
-        // Total dus barang rusak / bad stock dalam cakupan akses pengguna.
         $damagedQuery = DamagedStock::when($warehouseId !== null, function ($query) use ($warehouseId) {
             $query->where('warehouse_id', $warehouseId);
         });
@@ -131,12 +105,74 @@ class DashboardController extends Controller
             ->limit(4)
             ->get();
 
-        // Ringkasan masing-masing gudang untuk dashboard.
-        $warehouseSummaries = $warehouses->map(function ($warehouse) {
-            $areaQuery = Area::where('is_active', true)
-                ->where('warehouse_id', $warehouse->id);
+        // Data Grafik 1: Tren Pergerakan Barang 7 Hari Terakhir (IN, OUT, MOVE)
+        $startDate = Carbon::today()->subDays(6);
+        $txQuery = StorageTransaction::whereDate('transaction_date', '>=', $startDate)
+            ->when($warehouseId !== null, function ($query) use ($warehouseId) {
+                $query->where(function ($sub) use ($warehouseId) {
+                    $sub->whereHas('toRackLevel.rack.area', fn($q) => $q->where('warehouse_id', $warehouseId))
+                        ->orWhereHas('fromRackLevel.rack.area', fn($q) => $q->where('warehouse_id', $warehouseId));
+                });
+            })
+            ->get();
 
-            $totalAreaGudang = $areaQuery->count();
+        $chartDates = [];
+        $chartIn = [];
+        $chartOut = [];
+        $chartMove = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $day = Carbon::today()->subDays($i);
+            $dayStr = $day->format('Y-m-d');
+            $chartDates[] = $day->format('d M');
+
+            $dayTxs = $txQuery->filter(fn($tx) => $tx->transaction_date && $tx->transaction_date->format('Y-m-d') === $dayStr);
+
+            $chartIn[] = (int) $dayTxs->where('transaction_type', 'IN')->sum('pallet_quantity');
+            $chartOut[] = (int) $dayTxs->where('transaction_type', 'OUT')->sum('pallet_quantity');
+            $chartMove[] = (int) $dayTxs->where('transaction_type', 'MOVE')->sum('pallet_quantity');
+        }
+
+        // Data Grafik 2: Komposisi Stok Aktif per Kategori Produk
+        $categoryGrouped = $placements
+            ->filter(fn($p) => $p->pallet_quantity > 0)
+            ->groupBy(fn($p) => $p->product->category->category_name ?? ($p->product->product_name ?? 'Lainnya'))
+            ->map(fn($group) => (int) $group->sum('pallet_quantity'));
+
+        $categoryLabels = $categoryGrouped->keys()->values()->toArray();
+        $categoryValues = $categoryGrouped->values()->toArray();
+
+        // Hitung total dus rusak per rack_level_id & product_id dari tabel damaged_stocks
+        $damagedByLevelProduct = DamagedStock::when($warehouseId !== null, function ($query) use ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        })
+            ->selectRaw('rack_level_id, product_id, SUM(damaged_cartons) as total_damaged')
+            ->groupBy('rack_level_id', 'product_id')
+            ->get()
+            ->mapWithKeys(fn($row) => [$row->rack_level_id . '_' . $row->product_id => (int) $row->total_damaged]);
+
+        // Data Visual Denah Rak 2D Interaktif
+        $visualRacks = Rack::with([
+            'area.warehouse',
+            'levels' => function ($q) {
+                $q->orderByDesc('level_number');
+            },
+            'levels.storagePlacement.product',
+        ])
+            ->where('is_active', true)
+            ->whereHas('area', function ($query) use ($warehouseId) {
+                $query->where('is_active', true);
+                if ($warehouseId !== null) {
+                    $query->where('warehouse_id', $warehouseId);
+                }
+            })
+            ->orderBy('rack_code')
+            ->get();
+
+        $warehouseSummaries = $warehouses->map(function ($warehouse) {
+            $totalAreaGudang = Area::where('is_active', true)
+                ->where('warehouse_id', $warehouse->id)
+                ->count();
 
             $totalRakGudang = Rack::where('is_active', true)
                 ->whereHas('area', function ($query) use ($warehouse) {
@@ -168,7 +204,6 @@ class DashboardController extends Controller
                 ->get();
 
             $palletTerisi = (int) $placementsGudang->sum('pallet_quantity');
-
             $palletTersedia = max(0, $kapasitasPallet - $palletTerisi);
 
             $kartonTerisi = (int) $placementsGudang->sum(function ($placement) {
@@ -177,9 +212,7 @@ class DashboardController extends Controller
             });
 
             $kapasitasKarton = $kapasitasPallet * 120;
-
-            $barangRusakGudang = (int) DamagedStock::where('warehouse_id', $warehouse->id)
-                ->sum('damaged_cartons');
+            $barangRusakGudang = (int) DamagedStock::where('warehouse_id', $warehouse->id)->sum('damaged_cartons');
 
             $persentaseTerisi = $kapasitasPallet > 0
                 ? min(100, ($palletTerisi / $kapasitasPallet) * 100)
@@ -202,6 +235,7 @@ class DashboardController extends Controller
         });
 
         return view('dashboard', compact(
+            'damagedByLevelProduct',
             'totalGudang',
             'totalArea',
             'totalRak',
@@ -213,6 +247,13 @@ class DashboardController extends Controller
             'totalKartonTerisi',
             'totalBarangRusak',
             'recentDamagedStocks',
+            'chartDates',
+            'chartIn',
+            'chartOut',
+            'chartMove',
+            'categoryLabels',
+            'categoryValues',
+            'visualRacks',
             'warehouseSummaries'
         ));
     }
