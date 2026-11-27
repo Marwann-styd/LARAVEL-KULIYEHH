@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class AreaController extends Controller
@@ -12,13 +13,21 @@ class AreaController extends Controller
     // Menampilkan daftar area
     public function index(Request $request)
     {
-        $warehouses = Warehouse::orderBy('warehouse_code')->get();
+        $user = Auth::user();
+
+        $warehousesQuery = Warehouse::orderBy('warehouse_code');
+        if ($user->role !== 'super_admin') {
+            $warehousesQuery->where('id', $user->warehouse_id ?? 0);
+        }
+        $warehouses = $warehousesQuery->get();
 
         $query = Area::with('warehouse')
             ->withCount('racks');
 
-        // Filter berdasarkan gudang
-        if ($request->filled('warehouse_id')) {
+        // Isolasi gudang untuk non-super_admin
+        if ($user->role !== 'super_admin') {
+            $query->where('warehouse_id', $user->warehouse_id ?? 0);
+        } elseif ($request->filled('warehouse_id')) {
             $query->where('warehouse_id', $request->warehouse_id);
         }
 
@@ -36,9 +45,16 @@ class AreaController extends Controller
     // Menampilkan form tambah area
     public function create()
     {
-        $warehouses = Warehouse::where('is_active', true)
-            ->orderBy('warehouse_code')
-            ->get();
+        $user = Auth::user();
+
+        $warehousesQuery = Warehouse::where('is_active', true)
+            ->orderBy('warehouse_code');
+
+        if ($user->role !== 'super_admin') {
+            $warehousesQuery->where('id', $user->warehouse_id ?? 0);
+        }
+
+        $warehouses = $warehousesQuery->get();
 
         return view('areas.create', compact('warehouses'));
     }
@@ -46,6 +62,12 @@ class AreaController extends Controller
     // Menyimpan area baru
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user->role !== 'super_admin') {
+            $request->merge(['warehouse_id' => $user->warehouse_id]);
+        }
+
         $validated = $request->validate([
             'warehouse_id' => [
                 'required',
@@ -85,10 +107,19 @@ class AreaController extends Controller
     // Menampilkan form edit area
     public function edit(Area $area)
     {
-        $warehouses = Warehouse::where('is_active', true)
-            ->orWhere('id', $area->warehouse_id)
-            ->orderBy('warehouse_code')
-            ->get();
+        $this->authorizeWarehouseAccess($area);
+
+        $user = Auth::user();
+        $warehousesQuery = Warehouse::where(function ($q) use ($area) {
+            $q->where('is_active', true)
+                ->orWhere('id', $area->warehouse_id);
+        })->orderBy('warehouse_code');
+
+        if ($user->role !== 'super_admin') {
+            $warehousesQuery->where('id', $user->warehouse_id ?? 0);
+        }
+
+        $warehouses = $warehousesQuery->get();
 
         return view('areas.edit', compact(
             'area',
@@ -99,6 +130,13 @@ class AreaController extends Controller
     // Memperbarui data area
     public function update(Request $request, Area $area)
     {
+        $this->authorizeWarehouseAccess($area);
+
+        $user = Auth::user();
+        if ($user->role !== 'super_admin') {
+            $request->merge(['warehouse_id' => $user->warehouse_id]);
+        }
+
         $validated = $request->validate([
             'warehouse_id' => [
                 'required',
@@ -136,6 +174,8 @@ class AreaController extends Controller
     // Mengaktifkan atau menonaktifkan area
     public function toggleStatus(Area $area)
     {
+        $this->authorizeWarehouseAccess($area);
+
         $area->update([
             'is_active' => !$area->is_active,
         ]);
@@ -148,6 +188,8 @@ class AreaController extends Controller
     // Menghapus area yang belum memiliki rak
     public function destroy(Area $area)
     {
+        $this->authorizeWarehouseAccess($area);
+
         if ($area->racks()->exists()) {
             return redirect()
                 ->route('areas.index')
@@ -159,5 +201,13 @@ class AreaController extends Controller
         return redirect()
             ->route('areas.index')
             ->with('success', 'Data area berhasil dihapus.');
+    }
+
+    private function authorizeWarehouseAccess(Area $area): void
+    {
+        $user = Auth::user();
+        if ($user->role !== 'super_admin' && (int) $area->warehouse_id !== (int) $user->warehouse_id) {
+            abort(403, 'Anda tidak memiliki akses ke area gudang lain.');
+        }
     }
 }

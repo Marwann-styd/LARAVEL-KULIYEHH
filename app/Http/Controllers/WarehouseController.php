@@ -15,9 +15,9 @@ class WarehouseController extends Controller
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('warehouse_code', 'ilike', "%{$search}%")
-                        ->orWhere('warehouse_name', 'ilike', "%{$search}%")
-                        ->orWhere('location', 'ilike', "%{$search}%");
+                    $q->where('warehouse_code', 'like', "%{$search}%")
+                        ->orWhere('warehouse_name', 'like', "%{$search}%")
+                        ->orWhere('location', 'like', "%{$search}%");
                 });
             })
             ->oldest()

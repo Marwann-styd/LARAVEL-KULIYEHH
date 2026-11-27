@@ -111,7 +111,7 @@ class StorageTransactionController extends Controller
     {
         $user = Auth::user();
 
-        // Master produk digunakan bersama oleh kedua gudang.
+        // Master produk digunakan bersama oleh semua gudang.
         $products = Product::where('is_active', true)
             ->orderBy('product_name')
             ->get();
@@ -333,13 +333,15 @@ class StorageTransactionController extends Controller
                         );
                     }
 
-                    if ($quantity > $placement->pallet_quantity) {
+                    $availableGoodPallets = $this->calculateGoodPallets($placement, $product);
+
+                    if ($quantity > $availableGoodPallets) {
                         throw new \RuntimeException(
-                            'Jumlah pallet keluar melebihi stok yang tersedia.'
+                            "Jumlah pallet keluar melebihi stok layak kirim (Tersedia: {$availableGoodPallets} pallet baik; tercatat {$placement->damaged_cartons} karton bad stock pada lokasi ini)."
                         );
                     }
 
-                    if ($quantity == $placement->pallet_quantity) {
+                    if ($quantity == $placement->pallet_quantity && (int) $placement->damaged_cartons === 0) {
 
                         $placement->delete();
                     } else {
@@ -371,9 +373,11 @@ class StorageTransactionController extends Controller
                         );
                     }
 
-                    if ($quantity > $source->pallet_quantity) {
+                    $availableGoodPallets = $this->calculateGoodPallets($source, $product);
+
+                    if ($quantity > $availableGoodPallets) {
                         throw new \RuntimeException(
-                            'Jumlah pallet pindah melebihi stok di lokasi asal.'
+                            "Jumlah pallet pindah melebihi stok layak kirim di lokasi asal (Tersedia: {$availableGoodPallets} pallet baik; tercatat {$source->damaged_cartons} karton bad stock)."
                         );
                     }
 
@@ -405,7 +409,7 @@ class StorageTransactionController extends Controller
                     }
 
                     // Mengurangi stok asal.
-                    if ($quantity == $source->pallet_quantity) {
+                    if ($quantity == $source->pallet_quantity && (int) $source->damaged_cartons === 0) {
 
                         $source->delete();
                     } else {
@@ -479,7 +483,25 @@ class StorageTransactionController extends Controller
     }
 
     // ==========================================
-    // 4. MENGUNCI LEVEL RAK
+    // 4. MENGHITUNG PALLET LAYAK KIRIM (NON-BAD STOCK)
+    // ==========================================
+
+    private function calculateGoodPallets(StoragePlacement $placement, Product $product): int
+    {
+        $damagedCartons = (int) ($placement->damaged_cartons ?? 0);
+
+        if ($damagedCartons <= 0) {
+            return (int) $placement->pallet_quantity;
+        }
+
+        $cartonsPerPallet = max(1, (int) ($product->cartons_per_pallet ?? 1));
+        $blockedPallets = (int) ceil($damagedCartons / $cartonsPerPallet);
+
+        return max(0, (int) $placement->pallet_quantity - $blockedPallets);
+    }
+
+    // ==========================================
+    // 5. MENGUNCI LEVEL RAK
     // ==========================================
 
     private function getLockedLevels(array $ids)
@@ -508,10 +530,10 @@ class StorageTransactionController extends Controller
     }
 
     // ==========================================
-    // 5. MEMERIKSA HAK AKSES LOKASI
+    // 6. MEMERIKSA HAK AKSES LOKASI
     // ==========================================
 
-    private function ensureLevelAccessible(RackLevel $level, user $user)
+    private function ensureLevelAccessible(RackLevel $level, User $user)
     {
         $this->ensureLevelActive($level);
 
@@ -533,7 +555,7 @@ class StorageTransactionController extends Controller
     }
 
     // ==========================================
-    // 6. MEMERIKSA STATUS LOKASI
+    // 7. MEMERIKSA STATUS LOKASI
     // ==========================================
 
     private function ensureLevelActive(RackLevel $level)
